@@ -32,7 +32,7 @@ module.exports.createMovie = (req, res, next) => {
       nameEN,
       owner: req.user._id
     })
-    .then((movie) => res.status(201).send(movie))
+    .then((movie) => res.status(201).send(movie),console.log(req.body))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
@@ -42,23 +42,24 @@ module.exports.createMovie = (req, res, next) => {
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  const { filmId } = req.params;
+  const { movieId } = req.params;
+  const userId = req.user._id
   Movie
-  .findById(filmId)
+  .findById(movieId)
   .then((movie) => {
     if (!movie) {
-      throw new NotFoundError('Карточка не найдена');
+      throw new NotFoundError('Фильм не найден');
     }
     if (movie.owner.toString() !== userId) {
-      throw new ForbiddenError('Карточка принадлежит другому пользователю');
+      throw new ForbiddenError('Фильм принадлежит другому пользователю');
     }
-    card.deleteOne()
-        .then(() => res.send({ message: 'Card is deleted' }))
+    Movie.deleteOne()
+        .then(() => res.send({ message: 'Movie is deleted' }))
         .catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestError('Передан некорректный id карточки'));
+        return next(new BadRequestError('Передан некорректный id фильма'));
       }
       return next(err);
     });

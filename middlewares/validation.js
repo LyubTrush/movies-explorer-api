@@ -33,7 +33,7 @@ module.exports.saveMovieValidate = celebrate({
     description: Joi.string().required(),
     image: Joi.string().required().regex(linkImageRegex),
     thumbnail: Joi.string().required().regex(linkImageRegex),
-    trailer: Joi.string().required().regex(linkRegex),
+    trailerLink: Joi.string().required().regex(linkRegex),
     movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
@@ -41,7 +41,7 @@ module.exports.saveMovieValidate = celebrate({
 });
 
 module.exports.deleteMovieValidate = celebrate({
-  body: Joi.object().keys({
+  params: Joi.object().keys({
     movieId: Joi.string().required().length(24).hex(),
   }),
 });
