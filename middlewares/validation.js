@@ -1,7 +1,6 @@
 const { Joi, celebrate } = require('celebrate');
 const { linkRegex, linkImageRegex } = require('../utils/regex');
 
-
 module.exports.createUserValidate = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
@@ -19,7 +18,7 @@ module.exports.loginValidate = celebrate({
 
 module.exports.updateProfileValidate = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
     email: Joi.string().required().email(),
   }),
 });
@@ -29,7 +28,7 @@ module.exports.saveMovieValidate = celebrate({
     country: Joi.string().required(),
     director: Joi.string().required(),
     duration: Joi.number().required(),
-    year: Joi.string().min(4).max(4).required(),
+    year: Joi.string().required(),
     description: Joi.string().required(),
     image: Joi.string().required().regex(linkImageRegex),
     thumbnail: Joi.string().required().regex(linkImageRegex),
@@ -45,5 +44,3 @@ module.exports.deleteMovieValidate = celebrate({
     movieId: Joi.string().required().length(24).hex(),
   }),
 });
-
-

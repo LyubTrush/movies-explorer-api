@@ -19,5 +19,4 @@ router.use('/*', (req, res, next) => {
   next(new NotFoundError('404: страница не существует'));
 });
 
-
 module.exports = router;

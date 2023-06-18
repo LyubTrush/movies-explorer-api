@@ -1,10 +1,8 @@
-// email — почта пользователя, по которой он регистрируется. Это обязательное поле, уникальное для каждого пользователя.
-// Также оно должно валидироваться на соответствие схеме электронной почты.
-// password — хеш пароля. Обязательное поле-строка. Нужно задать поведение по умолчанию, чтобы база данных не возвращала это поле.
-// name — имя пользователя, например: Александр или Мария. Это обязательное поле-строка от 2 до 30 символов.
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
+
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -20,10 +18,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false,
-    validate: {
-      validator: (value) => value.length >= 8,
-      message: 'Пароль должен содержать минимум 8 символов',
-    },
   },
   name: {
     type: String,

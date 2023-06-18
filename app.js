@@ -6,18 +6,24 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const errorHandler = require('./middlewares/errorHandler');
+const rateLimiter = require('./utils/rateLimiter');
 const routes = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { DATABASE } = require('./utils/constants');
 
-const { PORT = 3000 } = process.env;
+const {
+  PORT = 3000,
+  MONGO_LINK = DATABASE,
+} = process.env;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(helmet());
 
-mongoose.connect('mongodb://127.0.0.1:27017/moviesdb');
+mongoose.connect(MONGO_LINK);
 app.use(requestLogger);
+app.use(rateLimiter);
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');

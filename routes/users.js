@@ -1,7 +1,7 @@
 // добавить валидацию
 
 const userRouter = require('express').Router();
-const { updateProfileValidate }=require('../middlewares/validation')
+const { updateProfileValidate } = require('../middlewares/validation');
 
 const {
   getUser,

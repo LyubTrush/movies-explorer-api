@@ -1,6 +1,7 @@
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
 const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
@@ -26,19 +27,27 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.updateUser = (req, res, next) => {
-  const { name, about } = req.body;
+  const { name, email } = req.body;
   const userId = req.user._id;
-  User.findByIdAndUpdate(
-    userId,
-    {
-      name,
-      about,
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
+
+  // Проверка на дублирование email
+  User.findOne({ email })
+    .then((user) => {
+      if (user && user._id.toString() !== userId) {
+        throw new BadRequestError('Пользователь с таким email уже существует');
+      }
+      return User.findByIdAndUpdate(
+        userId,
+        {
+          name,
+          email,
+        },
+        {
+          new: true,
+          runValidators: true,
+        },
+      );
+    })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
@@ -63,11 +72,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       // аутентификация успешна! пользователь в переменной user
     // создадим токен
-      if (!user || !password) {
-        return next(new BadRequestError('Неверный email или пароль.'));
-      }
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key', { expiresIn: '7d' });
-      console.log({ token });
       // вернём токен
       return res.send({ token });
     })
@@ -96,7 +101,6 @@ module.exports.createUser = (req, res, next) => {
         _id,
       });
     })
-    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Некорректные данные пользователя'));
